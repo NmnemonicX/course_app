@@ -7,6 +7,7 @@ const mongoose = require('mongoose');
 
 const indexRouter = require('./routers/index');
 const usersRouter = require('./routers/users');
+const advertisementRouter = require('./routers/advertisement');
 
 
 const app = express();
@@ -18,7 +19,7 @@ app.use(cors());
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 //app.use('/public', express.static(__dirname + '/public'));
-//app.use('/api/advertisements', advertisementRouter);
+app.use('/advertisements', advertisementRouter);
 //app.use('/api/chat', chatRouter);
 
 
