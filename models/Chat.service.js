@@ -68,7 +68,7 @@ async function sendMessage(body) {
 
         await ChatService.findByIdAndUpdate(chat._id,{$push: {messages: newMessage._id}} )
 
-        return  await getHistory(chat._id)
+        return newMessage // await getHistory(chat._id)
 
     }
     else {
@@ -91,10 +91,15 @@ async function sendMessage(body) {
 
         await ChatService.findByIdAndUpdate(chatCreated._id,{$push: {messages: newMessage._id}} )
 
-    return await getHistory(chatCreated._id)
+    return   newMessage //await getHistory(chatCreated._id)
     }
 
 
+
+    async function getMessage(id) {
+        return await MessageService.findById(id).select('-__v',);
+
+    }
 
 
 }
