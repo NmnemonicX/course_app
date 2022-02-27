@@ -6,7 +6,7 @@ const userService = require('../models/User.service');
 
 
 
-router.post('/', getAll);
+router.get('/', getAll);
 router.post('/create', create);
 router.get('/findByEmail/:email', findByEmail);
 

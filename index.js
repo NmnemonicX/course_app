@@ -8,6 +8,7 @@ const mongoose = require('mongoose');
 const indexRouter = require('./routers/index');
 const usersRouter = require('./routers/users');
 const advertisementRouter = require('./routers/advertisement');
+const chatRouter = require('./routers/chat');
 
 
 const app = express();
@@ -20,7 +21,7 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 //app.use('/public', express.static(__dirname + '/public'));
 app.use('/advertisements', advertisementRouter);
-//app.use('/api/chat', chatRouter);
+app.use('/chat', chatRouter);
 
 
 

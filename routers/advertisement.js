@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const Advertisement = require('../models/Advertisement')
 const Advertisementervice = require('../models/Advertisement.service');
 
 
