@@ -16,7 +16,7 @@ async function find(body) {
     const {users} = body;  // это если в body = users:[ObjectId, ObjectId]
  console.log('users')
  console.log(users)
-    const Chat = await ChatService.find({
+    const Chat = await ChatService.findOne({
          users:users
         });
     return Chat
