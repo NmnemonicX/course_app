@@ -1,16 +1,18 @@
 const express = require('express');
 const router = express.Router();
 const Advertisementervice = require('../models/Advertisement.service');
+const fileMiddleware = require('../middleware/file');
 
 
-router.post('/', create);
+router.post('/',fileMiddleware.array('images',12), create);
 router.post('/find', find);
 router.get('/:id', findId);
 router.delete('/:id', deleteA);
 
-
 async function create(req, res, next) {
-    await Advertisementervice.create(req.body)
+    console.log("req.files")
+    console.log(req.files)
+    await Advertisementervice.create(req.body,req.files.map((item)=>{return item.filename } ))
         .then(advertisement => res.json(advertisement))
         .catch(err => next(err));
 }

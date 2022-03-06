@@ -41,9 +41,8 @@ router.post('/signup',
     });
 
 router.post('/signin', (req, res, next) => {
-    passport.authenticate("local", function (err, user, info) {
-        console.log('user controller', user)
-        console.log('error controller', err)
+    passport.authenticate("local", function (err, user) {
+
         if (err) {
             return res.status(400).json({
                 error: "Неверный логин или пароль",

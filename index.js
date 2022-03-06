@@ -69,7 +69,7 @@ const app = express();
 app.use(bodyParser());
 app.use(cors());
 
-
+app.use('/public', express.static(__dirname + '/public'));
 
 app.use(require('express-session')({
     secret: process.env.COOKIE_SECRET || 'secret',
@@ -82,7 +82,7 @@ app.use(passport.session(undefined))
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
-//app.use('/public', express.static(__dirname + '/public'));
+
 app.use('/advertisements', advertisementRouter);
 app.use('/chat', chatRouter);
 

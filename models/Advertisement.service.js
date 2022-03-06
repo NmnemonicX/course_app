@@ -47,15 +47,21 @@ console.log(userId);
       }
 }
 
-async function create(data) {
+async function create(data,files) {
+    console.log("files")
+    console.log(files)
+    const images = files
     const {shortText, description,tags,userId} = data;
 
     let newAdvertisement = await AdvertisementService.create({
         shortText,
         description,
+        images,
         tags,
         userId
     })
+
+
     return newAdvertisement;
 }
 async function deleteA(id) {
