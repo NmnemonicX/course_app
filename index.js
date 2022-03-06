@@ -57,11 +57,10 @@ passport.serializeUser(function (user, cb) {
     cb(null, user.id)
 })
 
-passport.deserializeUser(function (id, cb) {
-    db.users.findById(id, function (err, user) {
-        if (err) { return cb(err) }
+passport.deserializeUser(async function (id, cb) {
+    const user = await User.findById(id);
         cb(null, user)
-    })
+
 })
 
 

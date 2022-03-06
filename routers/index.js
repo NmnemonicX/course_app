@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const User = require('../models/Users')
 const bcrypt = require('bcrypt');
+const passport = require('passport');
 
 router.get('/', (req, res) => {
     res.json('Пусто');
@@ -39,7 +40,35 @@ router.post('/signup',
         });
     });
 
-
+router.post('/signin', (req, res, next) => {
+    passport.authenticate("local", function (err, user, info) {
+        console.log('user controller', user)
+        console.log('error controller', err)
+        if (err) {
+            return res.status(400).json({
+                error: "Неверный логин или пароль",
+                status: "error"
+            });
+        }
+        req.logIn(user,  function (err) {
+            if (err) {
+                return res.status(400).json({
+                    error: "Неверный логин или пароль",
+                    status: "error"
+                });
+            }
+            return res.status(200).json({
+                data: {
+                    id: user._id,
+                    email: user.email,
+                    name: user.name,
+                    contactPhone: user.contactPhone
+                },
+                status: "ok"
+            });
+        });
+    }) (req, res, next);
+});
 
 
 
