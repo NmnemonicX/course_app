@@ -62,7 +62,26 @@ async function create(data,files) {
     })
 
 
-    return newAdvertisement;
+    const newresp = {
+        data: [
+            {
+                id: newAdvertisement._id,
+                shortText: newAdvertisement.shortText,
+                description: newAdvertisement.description,
+                images: newAdvertisement.images,
+                user: {
+                    id: newAdvertisement.userId,
+                    //name: newAdvertisement.user.name
+                },
+                createdAt: newAdvertisement.createdAt
+            }
+        ],
+        status: "ok"
+    }
+
+
+    return newresp;
+    //return newAdvertisement;
 }
 async function deleteA(id) {
 
