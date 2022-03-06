@@ -56,6 +56,7 @@ router.post('/signin', (req, res, next) => {
                     status: "error"
                 });
             }
+            req.session.currentUser=user._id  //сохраняем пользователя в сессии
             return res.status(200).json({
                 data: {
                     id: user._id,

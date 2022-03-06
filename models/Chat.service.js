@@ -23,7 +23,10 @@ async function find(body) {
 }
 
 async function getHistory(id) {
-    return await ChatService.findById(id).select('messages',);
+    const xtemp = await ChatService.findById(id).select('messages',);
+
+    return   xtemp.messages
+   // return await ChatService.findById(id).select('messages',);
 
 }
 
@@ -96,14 +99,14 @@ async function sendMessage(body) {
 
 
 
-    async function getMessage(id) {
-        return await MessageService.findById(id).select('-__v',);
 
-    }
 
 
 }
 
+async function getMessage(id) {
+    return await MessageService.findById(id).select('-__v',);
 
+}
 
 

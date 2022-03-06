@@ -3,6 +3,10 @@ const cors = require('cors');
 const formData = require("express-form-data");
 const bodyParser = require("body-parser");
 const mongoose = require('mongoose');
+const http = require('http');
+const socketIO = require('socket.io');
+
+const Chatservice = require('./models/Chat.service');
 
 const User = require('./models/Users')
 const userService = require('./models/User.service');
@@ -17,6 +21,7 @@ const indexRouter = require('./routers/index');
 const usersRouter = require('./routers/users');
 const advertisementRouter = require('./routers/advertisement');
 const chatRouter = require('./routers/chat');
+
 
 async function verify(email, password, done) {
     User.findOne({email: email})
@@ -65,6 +70,9 @@ passport.deserializeUser(async function (id, cb) {
 
 
 const app = express();
+const server = http.Server(app);
+const io = socketIO(server);
+
 
 app.use(bodyParser());
 app.use(cors());
@@ -89,9 +97,54 @@ app.use('/chat', chatRouter);
 
 
 //тут сокет
+io.on('connection', (socket) => {
+    const {id} = socket;
+    console.log(`Socket connected: ${id}`);
+
+    // работа с комнатами  Чат это комната
+    const {ChatId} = socket.handshake.query;
+    console.log(`Socket roomName: ${ChatId}`);
+    socket.join(ChatId);
 
 
 
+    socket.on('getHistory', async (msg) => {
+        msg.type = `room: ${ChatId} + gethistory`;
+        const author = msg.author
+        const receiver = msg.receiver
+        console.log('receiver', msg.receiver);
+        console.log('author', msg.author);
+        const chat = await Chatservice.find({users:[author,receiver]})
+        console.log('chat');
+        console.log(chat);
+        const history = await Chatservice.getHistory(chat._id)
+        console.log('history');
+        console.log(history);
+        socket.to(chat._id).emit('chatHistory', history);
+        socket.emit('chatHistory', history);
+    });
+
+
+    socket.on('sendMessage', async (msg) => {
+        msg.type = 'newMessage ';
+        console.log('receiver', msg.receiver);
+        console.log('author', msg.author);
+        console.log('text', msg.text);
+        const Message = await Chatservice.sendMessage({author:msg.author, receiver:msg.receiver, text:msg.text})
+        const chat = await Chatservice.find({users:[msg.author,msg.receiver]})
+
+        if(!socket.rooms[chat._id]) {
+            socket.join(chat._id);
+        }
+        socket.to(chat._id).emit('newMessage ', Message);
+        socket.emit('newMessage ', Message);
+    });
+
+
+    socket.on('disconnect', () => {
+        console.log(`Socket disconnected: ${id}`);
+    })
+})
 
 const PORT = process.env.PORT||3000;
 const UserDB = process.env.DB_USERNAME || 'root';
@@ -110,7 +163,10 @@ async function start() {
         });
 
 
-        app.listen(PORT, () => {
+        // app.listen(PORT, () => {
+        //     console.log(`Server is running, go to http://localhost:${PORT}/`)
+        // });
+        server.listen(PORT, () => {
             console.log(`Server is running, go to http://localhost:${PORT}/`)
         });
     } catch (e) {
