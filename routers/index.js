@@ -69,6 +69,13 @@ router.post('/signin', (req, res, next) => {
     }) (req, res, next);
 });
 
+router.get('/logout',
+    function (req, res) {
+        req.logout()
+       //req.session.destroy();
+        res.json(`logout`)
+    })
+
 
 
 

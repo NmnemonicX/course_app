@@ -2,6 +2,10 @@
 
 const bcrypt = require('bcrypt');
 const AdvertisementService = require('../models/Advertisement')
+const userService = require('../models/User.service');
+
+
+
 
 module.exports = {
 
@@ -18,7 +22,7 @@ async function getAll() {
 }
 
 async function findId(id) {
-    return await Advertisement.findById(id).select('-__v');
+    return await AdvertisementService.findById(id).select('-__v');
 
 }
 
@@ -47,9 +51,11 @@ console.log(userId);
       }
 }
 
-async function create(data,files) {
+async function create(data,files,user) {
     console.log("files")
     console.log(files)
+    console.log("user")
+    console.log(user)
     const images = files
     const {shortText, description,tags,userId} = data;
 
@@ -58,7 +64,7 @@ async function create(data,files) {
         description,
         images,
         tags,
-        userId
+        userId:user.id
     })
 
 
@@ -71,7 +77,7 @@ async function create(data,files) {
                 images: newAdvertisement.images,
                 user: {
                     id: newAdvertisement.userId,
-                    //name: newAdvertisement.user.name
+                    name: user.name
                 },
                 createdAt: newAdvertisement.createdAt
             }
@@ -83,8 +89,21 @@ async function create(data,files) {
     return newresp;
     //return newAdvertisement;
 }
-async function deleteA(id) {
+async function deleteA(id,userD,res) {
+console.log("userD")
+console.log(userD)
+    console.log("id")
+    console.log(id)
+    //const adv = await AdvertisementService.find({id:id,userId:userD.id }).select('-__v');
+    const adv = await AdvertisementService.findById(id).select('-__v');
+    console.log("adv")
+    console.log(adv.userId===userD.id)
+    if (adv.userId===userD.id) {
+        const resultDelete = await AdvertisementService.findByIdAndUpdate(id, {isDeleted: true});
 
-    return  await AdvertisementService.findByIdAndUpdate(id, {isDeleted: true});
-
+        return resultDelete ? res.json(resultDelete) : res.sendStatus(404).json('Ошибка удаления')
+    }
+    else{
+        return  res.sendStatus(403).json('Ошибка удаления- это не ваше объявление')
+    }
 }
