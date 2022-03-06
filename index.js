@@ -4,11 +4,65 @@ const formData = require("express-form-data");
 const bodyParser = require("body-parser");
 const mongoose = require('mongoose');
 
+const User = require('./models/Users')
+const userService = require('./models/User.service');
+
+const passport = require('passport');
+const LocalStrategy = require('passport-local').Strategy
+const expressSession = require('express-session')
+
+let bcrypt = require('bcrypt');
 
 const indexRouter = require('./routers/index');
 const usersRouter = require('./routers/users');
 const advertisementRouter = require('./routers/advertisement');
 const chatRouter = require('./routers/chat');
+
+async function verify(email, password, done) {
+    User.findOne({email: email})
+        .then(
+            user => {
+                console.log('login...', user)
+                if (user) {
+                    bcrypt.compare(password,
+                        user.passwordHash,
+                        (err, isMatch) => {
+                            if (err) throw err;
+
+                            if (isMatch) {
+                                return done(null, user);
+                            } else {
+                                return done(null, false, {message: "Пароль не подходит"});
+                            }
+                        })
+                }
+            }
+        )
+        .catch(err => {
+            return done(null, false, {message: err});
+        })
+}
+
+const options = {
+    usernameField: 'email',
+    passwordField: 'password',
+    passReqToCallback: false,
+}
+
+
+passport.use('local', new LocalStrategy(options, verify)); //  Добавление стратегии для использования
+
+// Конфигурирование Passport для сохранения пользователя в сессии
+passport.serializeUser(function (user, cb) {
+    cb(null, user.id)
+})
+
+passport.deserializeUser(function (id, cb) {
+    db.users.findById(id, function (err, user) {
+        if (err) { return cb(err) }
+        cb(null, user)
+    })
+})
 
 
 const app = express();
@@ -16,6 +70,16 @@ const app = express();
 app.use(bodyParser());
 app.use(cors());
 
+
+
+app.use(require('express-session')({
+    secret: process.env.COOKIE_SECRET || 'secret',
+    resave: false,
+    saveUninitialized: false,
+}))
+
+app.use(passport.initialize(undefined))
+app.use(passport.session(undefined))
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
@@ -25,6 +89,7 @@ app.use('/chat', chatRouter);
 
 
 
+//тут сокет
 
 
 

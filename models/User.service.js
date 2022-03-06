@@ -34,12 +34,11 @@ async function create(data){
 
     let newUser = await UserService.create({
         email,
-        passwordHash: bcrypt.hashSync(password, 10), // hash the password early
+        passwordHash: bcrypt.hashSync(password, 20), // hash the password early
         name,
         contactPhone
     })
 
-    // return res.json(newUser);
     return newUser;
 
 
